@@ -226,7 +226,11 @@ export async function fetchPlaylist(
   return {
     id,
     title: textOf(info['title']) || 'Playlista',
+    description: textOf(info['description']),
     author: textOf(deepFind(info['author'], 'name') ?? info['author']),
+    lastUpdated: textOf(info['last_updated']),
+    views: textOf(info['views']),
+    privacy: textOf(info['privacy']),
     videoCount: videos.length,
     videos
   }

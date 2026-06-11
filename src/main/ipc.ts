@@ -8,6 +8,7 @@ import {
 } from '../shared/types'
 import { logout, openLoginWindow } from './auth'
 import { cancelClone, runClone } from './cloner'
+import { saveExport } from './export'
 import { fetchPlaylist, getAccountInfo, isLoggedIn } from './youtube'
 
 const YOUTUBE_URL = /^https:\/\/(www\.|music\.)?(youtube\.com|youtu\.be)\//
@@ -69,6 +70,10 @@ export function registerIpcHandlers(): void {
   })
 
   ipcMain.on(IPC.CloneCancel, () => cancelClone())
+
+  ipcMain.handle(IPC.ExportSave, (event, request: unknown) =>
+    saveExport(request, BrowserWindow.fromWebContents(event.sender))
+  )
 
   ipcMain.on(IPC.OpenExternal, (_event, url: unknown) => {
     if (typeof url === 'string' && YOUTUBE_URL.test(url)) void shell.openExternal(url)

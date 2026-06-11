@@ -14,9 +14,29 @@ export interface VideoItem {
 export interface PlaylistData {
   id: string
   title: string
+  /** Opis playlisty — InnerTube zwraca go tylko dla części playlist. */
+  description: string
   author: string
+  /** Lokalizowany tekst „ostatnia aktualizacja" z YouTube (lub pusty). */
+  lastUpdated: string
+  views: string
+  /** Surowa wartość z InnerTube: PUBLIC | UNLISTED | PRIVATE (lub pusta). */
+  privacy: string
   videoCount: number
   videos: VideoItem[]
+}
+
+export type ExportFormat = 'csv' | 'xml' | 'json'
+
+export interface ExportSaveRequest {
+  defaultName: string
+  content: string
+  format: ExportFormat
+}
+
+export interface ExportSaveResult {
+  saved: boolean
+  path?: string
 }
 
 export interface AuthState {

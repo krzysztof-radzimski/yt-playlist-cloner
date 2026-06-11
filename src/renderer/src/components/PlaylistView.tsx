@@ -3,6 +3,7 @@ import type { PlaylistData, VideoItem } from '@shared/types'
 import { formatLongDuration, plural } from '../lib/format'
 import { arrayMove, shuffleArray, sortVideos, videoKey, type SortSpec } from '../lib/sort'
 import ClonePanel from './ClonePanel'
+import ExportPanel from './ExportPanel'
 import SortControls from './SortControls'
 import VideoRow from './VideoRow'
 
@@ -176,6 +177,7 @@ export default function PlaylistView({
           onClone={onClone}
           onLoginRequest={onLoginRequest}
         />
+        <ExportPanel playlist={playlist} order={order} excluded={excluded} />
       </aside>
     </div>
   )

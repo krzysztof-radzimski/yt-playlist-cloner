@@ -628,6 +628,37 @@ body.platform-darwin .topbar {
   margin: 0 0 12px;
 }
 
+/* ===== Panel eksportu ===== */
+.export-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.export-row .select {
+  flex: 1;
+}
+
+.export-note {
+  color: var(--text-dim);
+  font-size: 12px;
+}
+
+.export-status {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--text-dim);
+  word-break: break-all;
+}
+
+.export-status-ok {
+  color: var(--ok);
+}
+
+.export-status-error {
+  color: var(--error);
+}
+
 /* ===== Modal klonowania ===== */
 .modal-backdrop {
   position: fixed;

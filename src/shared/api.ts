@@ -2,6 +2,8 @@ import type {
   AuthState,
   CloneProgress,
   CloneRequest,
+  ExportSaveRequest,
+  ExportSaveResult,
   FetchProgress,
   PlaylistData
 } from './types'
@@ -25,6 +27,9 @@ export interface RendererApi {
     start(request: CloneRequest): Promise<void>
     cancel(): void
     onProgress(callback: (progress: CloneProgress) => void): () => void
+  }
+  export: {
+    save(request: ExportSaveRequest): Promise<ExportSaveResult>
   }
   openExternal(url: string): void
 }

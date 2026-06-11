@@ -27,6 +27,8 @@ Ikona: źródłem jest `resources/icon.svg`; po jego zmianie uruchom `npm run ic
   first-party `ServiceLogin?service=youtube`, NIE OAuth — OAuth w webview jest blokowany).
 - `src/main/cloner.ts` — tworzenie playlisty + dodawanie paczkami (20 szt., 1,5 s przerwy,
   backoff 5 s podwajany) z postępem przez IPC i anulowaniem.
+- `src/main/export.ts` — natywne okno „Zapisz jako" + zapis pliku; treść (CSV/XML/JSON)
+  serializuje renderer w `lib/export.ts` (proces główny tylko waliduje i pisze na dysk).
 - `src/main/ipc.ts` — handlery IPC z walidacją wejścia (kanały w `src/shared/ipc.ts`).
 - `src/preload/index.ts` — `contextBridge` implementujący kontrakt `RendererApi`
   z `src/shared/api.ts`.
@@ -49,6 +51,11 @@ Ikona: źródłem jest `resources/icon.svg`; po jego zmianie uruchom `npm run ic
 - **Czytaj `page.items`, nie `page.videos`** — `Feed.videos` w youtubei.js skanuje całą
   odpowiedź browse i łapie sekcję „Polecane”, którą YouTube dokleja do playlist;
   `Playlist.items` filtruje ją po `style`.
+- **Eksport tylko z dostępnych pól** — `PlaylistVideo` (lista playlisty) NIE zawiera opisu
+  ani daty publikacji filmu; dostępne są tylko metadane playlisty (`description`,
+  `last_updated`, `views`, `privacy`) i pola per film (tytuł, kanał, czas, ID, dostępność).
+  Nie dorabiaj per-film opisów/dat przez `getInfo` bez świadomej zgody — to N żądań,
+  sięga po endpoint odtwarzacza i podnosi ryzyko blokady.
 - **Klient Innertube**: zawsze `retrieve_player: false` (bez playera nie trzeba interpretera JS);
   cookie-auth, nie OAuth (OAuth działa już tylko dla klienta TV).
 - **Playlisty mogą zawierać duplikaty filmów** — klucze w UI to `id:position` (`videoKey`),

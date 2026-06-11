@@ -7,5 +7,6 @@ export const IPC = {
   CloneStart: 'clone:start',
   CloneCancel: 'clone:cancel',
   CloneProgress: 'clone:progress',
+  ExportSave: 'export:save',
   OpenExternal: 'shell:open-external'
 } as const

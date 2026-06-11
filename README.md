@@ -12,6 +12,10 @@ swoim koncie.
 - **Własne prywatne playlisty** — po zalogowaniu w oknie aplikacji.
 - **Sortowanie** — kolejność oryginalna, tytuł, długość, kanał (z polskim collatorem),
   kierunek rosnąco/malejąco, tasowanie losowe i ręczne układanie przeciąganiem.
+- **Eksport do pliku** — zapis playlisty jako CSV, JSON lub XML: metadane playlisty
+  (tytuł, opis, data aktualizacji, wyświetlenia, prywatność) i lista filmów w bieżącej
+  kolejności (tytuł, kanał, czas, URL, pozycja, dostępność). Opisu i daty pojedynczych
+  filmów InnerTube nie udostępnia w danych playlisty, więc nie ma ich w eksporcie.
 - **Wybór filmów** — pojedyncze filmy można wykluczyć z klona; filmy niedostępne
   (usunięte/zablokowane) są pomijane domyślnie.
 - **Bezpieczne tempo zapisu** — filmy dodawane są paczkami po 20 z przerwami i wykładniczym
