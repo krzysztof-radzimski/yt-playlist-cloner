@@ -1,0 +1,20 @@
+appId: pl.abcpro.yt-playlist-cloner
+productName: YT Playlist Cloner
+directories:
+  output: release
+files:
+  - out/**
+asar: true
+npmRebuild: false
+mac:
+  category: public.app-category.utilities
+  target:
+    - dmg
+    - zip
+win:
+  target:
+    - nsis
+linux:
+  target:
+    - AppImage
+  category: Utility

@@ -1,0 +1,25 @@
+# Zależności
+node_modules/
+
+# Artefakty buildu
+out/
+dist/
+release/
+
+# Logi
+*.log
+npm-debug.log*
+
+# System
+.DS_Store
+Thumbs.db
+
+# Środowisko
+.env
+.env.*
+*.local
+
+# IDE
+.idea/
+.vscode/*
+!.vscode/extensions.json

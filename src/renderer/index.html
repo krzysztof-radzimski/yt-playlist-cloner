@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- 'unsafe-inline' i ws://localhost są potrzebne tylko w trybie dev (Vite HMR);
+         build produkcyjny zaostrza tę politykę pluginem strict-csp-on-build. -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src https://i.ytimg.com https://*.ggpht.com https://*.googleusercontent.com; connect-src 'self' ws://localhost:*; font-src 'self'; object-src 'none'; base-uri 'self'"
+    />
+    <title>YT Playlist Cloner</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,35 @@
+{
+  "name": "yt-playlist-cloner",
+  "version": "0.1.0",
+  "description": "Klonowanie playlist YouTube z innym sortowaniem — bez oficjalnego API Google",
+  "main": "./out/main/index.js",
+  "type": "commonjs",
+  "private": true,
+  "author": "Krzysztof Radzimski",
+  "license": "MIT",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "preview": "electron-vite preview",
+    "typecheck:node": "tsc --noEmit -p tsconfig.node.json --composite false",
+    "typecheck:web": "tsc --noEmit -p tsconfig.web.json --composite false",
+    "typecheck": "npm run typecheck:node && npm run typecheck:web",
+    "dist": "electron-vite build && electron-builder",
+    "dist:mac": "electron-vite build && electron-builder --mac",
+    "dist:win": "electron-vite build && electron-builder --win"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.3",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.2.0",
+    "electron": "^42.4.0",
+    "electron-builder": "^26.15.2",
+    "electron-vite": "^5.0.0",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "typescript": "^5.9.3",
+    "vite": "^7.0.0",
+    "youtubei.js": "^17.0.1"
+  }
+}
