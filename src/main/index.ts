@@ -1,5 +1,6 @@
 import { join } from 'node:path'
 import { BrowserWindow, app, session, shell } from 'electron'
+import appIcon from '../../resources/icon.png?asset'
 import { registerIpcHandlers } from './ipc'
 import { YT_PARTITION } from './youtube'
 
@@ -16,6 +17,8 @@ function createMainWindow(): void {
     title: 'YT Playlist Cloner',
     titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',
     trafficLightPosition: { x: 16, y: 18 },
+    // macOS bierze ikonę z bundle'a (.icns); okno potrzebuje jej na Win/Linux.
+    ...(process.platform !== 'darwin' ? { icon: appIcon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: true,
@@ -56,6 +59,11 @@ if (!app.requestSingleInstanceLock()) {
   })
 
   void app.whenReady().then(() => {
+    // W dev na macOS dock pokazywałby domyślną ikonę Electrona;
+    // w spakowanej aplikacji ikona pochodzi z bundle'a (.icns).
+    if (process.platform === 'darwin' && !app.isPackaged) {
+      app.dock?.setIcon(appIcon)
+    }
     // Strony w oknie logowania nie potrzebują żadnych uprawnień (kamera,
     // powiadomienia itd.) — domyślnie Electron by je przyznawał.
     session

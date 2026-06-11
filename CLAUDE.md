@@ -15,6 +15,10 @@ npm run dist:mac     # pakiet dystrybucyjny (electron-builder)
 
 Brak testów automatycznych — weryfikacja przez `npm run typecheck && npm run build`.
 
+Ikona: źródłem jest `resources/icon.svg`; po jego zmianie uruchom `npm run icon`
+(renderuje Electronem `build/icon.png` 1024² dla electron-buildera oraz
+`resources/icon.png` 512² używane w oknie/docku przez import `?asset`).
+
 ## Architektura
 
 - `src/main/youtube.ts` — klient Innertube (cache per zestaw ciasteczek), pobieranie playlisty

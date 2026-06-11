@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <!-- Ikona YT Playlist Cloner: szara karta źródłowa, na niej czerwona karta
+       klonu z glifem playlisty (trzy pozycje + przycisk odtwarzania). -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1d1d1f"/>
+      <stop offset="1" stop-color="#0c0c0d"/>
+    </linearGradient>
+    <linearGradient id="red" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ff2b55"/>
+      <stop offset="1" stop-color="#e60033"/>
+    </linearGradient>
+    <filter id="cardShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="28" flood-color="#000000" flood-opacity="0.45"/>
+    </filter>
+  </defs>
+
+  <!-- tło: ciemny zaokrąglony kwadrat z delikatną obwódką -->
+  <rect x="62" y="62" width="900" height="900" rx="204" fill="url(#bg)"/>
+  <rect x="64" y="64" width="896" height="896" rx="202" fill="none" stroke="#ffffff" stroke-opacity="0.07" stroke-width="4"/>
+
+  <!-- karta źródłowa (oryginał) -->
+  <rect x="322" y="208" width="490" height="368" rx="60" fill="#3a3a3e"/>
+
+  <!-- karta klonu -->
+  <g filter="url(#cardShadow)">
+    <rect x="212" y="336" width="490" height="368" rx="60" fill="url(#red)"/>
+  </g>
+
+  <!-- glif playlisty -->
+  <g fill="#ffffff">
+    <rect x="266" y="412" width="246" height="34" rx="17"/>
+    <rect x="266" y="488" width="246" height="34" rx="17"/>
+    <rect x="266" y="564" width="152" height="34" rx="17"/>
+    <path d="M 564 528 L 564 640 L 660 584 Z"/>
+  </g>
+</svg>
