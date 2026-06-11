@@ -1,4 +1,5 @@
 import { BrowserWindow, session, shell } from 'electron'
+import { getLanguage, mainStrings } from './locale'
 import { YT_PARTITION, invalidateClient, isLoggedIn } from './youtube'
 
 /**
@@ -9,9 +10,14 @@ import { YT_PARTITION, invalidateClient, isLoggedIn } from './youtube'
  * eksportowanych z zewnętrznej przeglądarki.
  */
 
-const LOGIN_URL =
-  'https://accounts.google.com/ServiceLogin?service=youtube&uilel=3&passive=true&continue=' +
-  encodeURIComponent('https://www.youtube.com/signin?action_handle_signin=true&app=desktop&hl=pl&next=%2F')
+function loginUrl(): string {
+  const hl = getLanguage()
+  const next = `https://www.youtube.com/signin?action_handle_signin=true&app=desktop&hl=${hl}&next=%2F`
+  return (
+    'https://accounts.google.com/ServiceLogin?service=youtube&uilel=3&passive=true&continue=' +
+    encodeURIComponent(next)
+  )
+}
 
 /**
  * Okno logowania nie może być furtką do swobodnego przeglądania internetu
@@ -47,7 +53,7 @@ export async function openLoginWindow(parent: BrowserWindow): Promise<boolean> {
       height: 720,
       parent,
       autoHideMenuBar: true,
-      title: 'Zaloguj się do YouTube',
+      title: mainStrings().main.loginWindowTitle,
       webPreferences: {
         partition: YT_PARTITION,
         nodeIntegration: false,
@@ -84,7 +90,7 @@ export async function openLoginWindow(parent: BrowserWindow): Promise<boolean> {
       void isLoggedIn().then(resolve)
     })
 
-    void win.loadURL(LOGIN_URL)
+    void win.loadURL(loginUrl())
   })
 }
 

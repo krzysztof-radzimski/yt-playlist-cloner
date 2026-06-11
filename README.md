@@ -1,78 +1,81 @@
 # YT Playlist Cloner
 
-Aplikacja desktopowa (Electron), która klonuje playlisty YouTube **bez oficjalnego API Google** —
-bez kluczy API i bez dziennych limitów quota. Wklejasz link do playlisty, układasz filmy po
-swojemu (sortowanie, tasowanie, ręczne przeciąganie) i zapisujesz kopię jako nową playlistę na
-swoim koncie.
+**English** · [Polski](README.pl.md)
 
-## Funkcje
+A desktop app (Electron) that clones YouTube playlists **without the official Google API** — no
+API keys and no daily quota limits. Paste a playlist link, arrange the videos your way (sort,
+shuffle, drag to reorder), and save a copy as a new playlist on your account.
 
-- **Pobieranie playlist bez logowania** — publiczne i niepubliczne (unlisted) playlisty czytane
-  są przez InnerTube (wewnętrzne API strony youtube.com) ze stronicowaniem po 100 filmów.
-- **Własne prywatne playlisty** — po zalogowaniu w oknie aplikacji.
-- **Sortowanie** — kolejność oryginalna, tytuł, długość, kanał (z polskim collatorem),
-  kierunek rosnąco/malejąco, tasowanie losowe i ręczne układanie przeciąganiem.
-- **Eksport do pliku** — zapis playlisty jako CSV, JSON lub XML: metadane playlisty
-  (tytuł, opis, data aktualizacji, wyświetlenia, prywatność) i lista filmów w bieżącej
-  kolejności (tytuł, kanał, czas, URL, pozycja, dostępność). Opisu i daty pojedynczych
-  filmów InnerTube nie udostępnia w danych playlisty, więc nie ma ich w eksporcie.
-- **Wybór filmów** — pojedyncze filmy można wykluczyć z klona; filmy niedostępne
-  (usunięte/zablokowane) są pomijane domyślnie.
-- **Bezpieczne tempo zapisu** — filmy dodawane są paczkami po 20 z przerwami i wykładniczym
-  backoffem, żeby nie wpaść w limity InnerTube (429).
-- **Logowanie w aplikacji** — sesja YouTube żyje w trwałej partycji Electrona
-  (`persist:youtube`); nic nie jest eksportowane ani wysyłane poza Twój komputer.
+The interface is **bilingual**: it shows in Polish on a Polish operating system and in English
+everywhere else (detected automatically from your OS language).
 
-## Jak to działa
+## Features
 
-Aplikacja nie używa YouTube Data API v3. Zamiast tego:
+- **Fetch playlists without signing in** — public and unlisted playlists are read through
+  InnerTube (youtube.com's internal API) with 100-videos-per-page continuation paging.
+- **Your own private playlists** — after signing in inside the app window.
+- **Sorting** — original order, title, length, channel (locale-aware collation), ascending or
+  descending, random shuffle, and manual drag-and-drop ordering.
+- **Export to file** — save the playlist as CSV, JSON, or XML: playlist metadata (title,
+  description, last-updated date, views, privacy) and the list of videos in the current order
+  (title, channel, duration, URL, position, availability). Per-video descriptions and dates are
+  not provided by InnerTube in the playlist data, so they are not included.
+- **Pick videos** — individual videos can be excluded from the clone; unavailable videos
+  (deleted/blocked) are skipped by default.
+- **Safe write pacing** — videos are added in batches of 20 with delays and exponential backoff
+  to stay clear of InnerTube rate limits (429).
+- **In-app sign-in** — the YouTube session lives in a persistent Electron partition
+  (`persist:youtube`); nothing is exported or sent anywhere off your computer.
 
-1. **Odczyt** — `youtubei.js` odpytuje endpoint `youtubei/v1/browse` (ten sam, którego używa
-   strona youtube.com) i przechodzi po tokenach kontynuacji, aż pobierze całą playlistę.
-2. **Logowanie** — okno aplikacji otwiera first-party stronę logowania Google
-   (`ServiceLogin?service=youtube`), dokładnie tak jak robią to ytmdesktop czy pear-desktop.
-   Ciasteczka sesji zostają w partycji Electrona.
-3. **Zapis** — `youtubei.js` woła `playlist/create` i `browse/edit_playlist` z podpisem
-   SAPISIDHASH wyliczanym z ciasteczka SAPISID. Kolejność dodawania filmów wyznacza kolejność
-   na nowej playliście.
+## How it works
 
-## Wymagania
+The app does not use the YouTube Data API v3. Instead:
+
+1. **Read** — `youtubei.js` queries the `youtubei/v1/browse` endpoint (the same one youtube.com
+   uses) and walks the continuation tokens until the whole playlist is fetched.
+2. **Sign-in** — the app window opens Google's first-party login page
+   (`ServiceLogin?service=youtube`), exactly as ytmdesktop and pear-desktop do. The session
+   cookies stay in the Electron partition.
+3. **Write** — `youtubei.js` calls `playlist/create` and `browse/edit_playlist` with a
+   SAPISIDHASH signature derived from the SAPISID cookie. The order in which videos are added
+   determines their order in the new playlist.
+
+## Requirements
 
 - Node.js 20+
 - npm
 
-## Uruchomienie
+## Running
 
 ```bash
 npm install
-npm run dev        # tryb deweloperski z HMR
+npm run dev        # development mode with HMR
 ```
 
-Build i typecheck:
+Build and type-check:
 
 ```bash
-npm run typecheck  # kontrola typów (main + renderer)
-npm run build      # build produkcyjny do out/
-npm run dist:mac   # pakiet .dmg (macOS)
-npm run dist:win   # instalator NSIS (Windows)
+npm run typecheck  # type checking (main + renderer)
+npm run build      # production build to out/
+npm run dist:mac   # .dmg package (macOS)
+npm run dist:win   # NSIS installer (Windows)
 ```
 
-## Ograniczenia
+## Limitations
 
-- Playlisty użytkownika mają twardy limit **5000 filmów** (limit YouTube).
-- **Miksów** (identyfikatory `RD…`) nie da się sklonować — są generowane na bieżąco.
-- Filmy usunięte lub zablokowane regionalnie nie mogą trafić do klona.
-- Klon powstaje jako playlista **prywatna** — widoczność zmienisz w YouTube/YouTube Studio.
-- Cudze playlisty **prywatne** są niedostępne (klonujesz to, co widzi Twoje konto).
+- User playlists have a hard limit of **5000 videos** (a YouTube limit).
+- **Mixes** (`RD…` IDs) can't be cloned — they are generated on the fly.
+- Deleted or region-blocked videos can't be added to the clone.
+- The clone is created as a **private** playlist — change its visibility in YouTube/YouTube Studio.
+- Other people's **private** playlists are inaccessible (you clone what your account can see).
 
-## Zastrzeżenie
+## Disclaimer
 
-Aplikacja korzysta z nieoficjalnego, niewersjonowanego API YouTube (InnerTube) i automatyzuje
-działania na Twoim koncie, co formalnie narusza Warunki korzystania z usługi YouTube. Jest
-przeznaczona do użytku osobistego, w rozsądnej skali (tempo zapisu jest celowo ograniczone).
-Udokumentowane ryzyko przy takim użyciu sprowadza się głównie do przejściowego ograniczenia
-żądań; używasz jej jednak na własną odpowiedzialność.
+The app uses YouTube's unofficial, unversioned API (InnerTube) and automates actions on your
+account, which formally violates the YouTube Terms of Service. It is intended for personal use at
+a reasonable scale (write pacing is intentionally limited). The documented risk for such use is
+mainly transient request throttling; you use it at your own risk.
 
-## Licencja
+## License
 
-MIT — patrz [LICENSE](LICENSE).
+MIT — see [LICENSE](LICENSE).

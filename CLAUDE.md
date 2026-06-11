@@ -34,9 +34,17 @@ Ikona: źródłem jest `resources/icon.svg`; po jego zmianie uruchom `npm run ic
   z `src/shared/api.ts`.
 - `src/renderer/` — React 19; `App.tsx` trzyma stan globalny (auth/playlista/klonowanie),
   `PlaylistView` stan kolejności i wykluczeń, sortowanie w `lib/sort.ts`.
+- `src/shared/i18n.ts` — wspólny słownik pl/en (frazy zależne od liczby/parametrów jako funkcje);
+  `resolveLanguage` wybiera polski, gdy język systemu zaczyna się od „pl". Proces główny używa
+  `src/main/locale.ts` (`mainStrings()`), renderer kontekstu `i18n.ts` (`useStrings()`); język
+  ustalany raz w mainie i przekazywany do renderera przez `additionalArguments` (preload → `window.api.language`).
 
 ## Twarde ograniczenia projektowe
 
+- **Cały tekst UI i komunikaty idą przez i18n** — nie wpisuj polskich ani angielskich napisów
+  na sztywno w komponentach ani w procesie głównym; dodaj klucz w `src/shared/i18n.ts` (pl i en)
+  i użyj `useStrings()` / `mainStrings()`. Odmiana liczb: pl ma 3 formy (helper `pluralPl`),
+  en 2 — frazy zależne od liczby są funkcjami w słowniku, nie składane w komponencie.
 - **Nie wprowadzaj YouTube Data API v3** — cały sens projektu to działanie bez kluczy i quoty.
 - **InnerTube jest niewersjonowane** — parsuj odpowiedzi defensywnie (deepFind/textOf, opcjonalne
   pola), nigdy sztywnymi ścieżkami JSON. Znane zmiany: token kontynuacji przeniesiony do

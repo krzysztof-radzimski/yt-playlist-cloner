@@ -4,9 +4,11 @@ import CloneModal from './components/CloneModal'
 import HomeScreen from './components/HomeScreen'
 import PlaylistView from './components/PlaylistView'
 import TopBar from './components/TopBar'
+import { useStrings } from './i18n'
 import { cleanIpcError } from './lib/format'
 
 export default function App(): React.JSX.Element {
+  const t = useStrings()
   const [auth, setAuth] = useState<AuthState>({ loggedIn: false })
   const [authBusy, setAuthBusy] = useState(false)
   const [appError, setAppError] = useState<string | null>(null)
@@ -35,11 +37,11 @@ export default function App(): React.JSX.Element {
     try {
       setAuth(await window.api.auth.login())
     } catch (err) {
-      setAppError(`Logowanie nie powiodło się: ${cleanIpcError(err)}`)
+      setAppError(t.loginFailed(cleanIpcError(err)))
     } finally {
       setAuthBusy(false)
     }
-  }, [])
+  }, [t])
 
   const handleLogout = useCallback(async () => {
     setAuthBusy(true)
@@ -47,11 +49,11 @@ export default function App(): React.JSX.Element {
     try {
       setAuth(await window.api.auth.logout())
     } catch (err) {
-      setAppError(`Wylogowanie nie powiodło się: ${cleanIpcError(err)}`)
+      setAppError(t.logoutFailed(cleanIpcError(err)))
     } finally {
       setAuthBusy(false)
     }
-  }, [])
+  }, [t])
 
   const handleFetch = useCallback(async (input: string) => {
     setFetching(true)
@@ -91,7 +93,7 @@ export default function App(): React.JSX.Element {
           <button
             className="app-error-close"
             onClick={() => setAppError(null)}
-            aria-label="Zamknij komunikat"
+            aria-label={t.dismissMessage}
           >
             ✕
           </button>

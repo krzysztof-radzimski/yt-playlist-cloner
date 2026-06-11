@@ -1,4 +1,5 @@
 import type { AuthState } from '@shared/types'
+import { useStrings } from '../i18n'
 
 interface Props {
   auth: AuthState
@@ -8,6 +9,7 @@ interface Props {
 }
 
 export default function TopBar({ auth, busy, onLogin, onLogout }: Props): React.JSX.Element {
+  const t = useStrings()
   return (
     <header className="topbar">
       <div className="brand">
@@ -15,7 +17,7 @@ export default function TopBar({ auth, busy, onLogin, onLogout }: Props): React.
           <rect x="1" y="4" width="22" height="16" rx="5" fill="currentColor" />
           <path d="M10 9.2l5.6 2.8-5.6 2.8z" fill="#fff" />
         </svg>
-        <span className="brand-name">YT Playlist Cloner</span>
+        <span className="brand-name">{t.appName}</span>
       </div>
       <div className="topbar-auth">
         {auth.loggedIn ? (
@@ -34,15 +36,15 @@ export default function TopBar({ auth, busy, onLogin, onLogout }: Props): React.
                   {(auth.accountName ?? '•').slice(0, 1).toUpperCase()}
                 </span>
               )}
-              <span className="account-name">{auth.accountName ?? 'Zalogowano'}</span>
+              <span className="account-name">{auth.accountName ?? t.signedIn}</span>
             </div>
             <button className="btn btn-ghost" onClick={onLogout} disabled={busy}>
-              Wyloguj
+              {t.signOut}
             </button>
           </>
         ) : (
           <button className="btn btn-primary" onClick={onLogin} disabled={busy}>
-            {busy ? 'Logowanie…' : 'Zaloguj się przez YouTube'}
+            {busy ? t.signingIn : t.signIn}
           </button>
         )}
       </div>

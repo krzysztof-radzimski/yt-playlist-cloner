@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { PLAYLIST_MAX_VIDEOS, PLAYLIST_TITLE_MAX_LENGTH } from '@shared/types'
-import { estimateCloneSeconds, formatEta, plural } from '../lib/format'
+import { useStrings } from '../i18n'
+import { estimateCloneSeconds } from '../lib/format'
 
 interface Props {
   playlistTitle: string
@@ -19,52 +20,47 @@ export default function ClonePanel({
   onClone,
   onLoginRequest
 }: Props): React.JSX.Element {
+  const t = useStrings()
   // Tytuł źródłowy może mieć pełne 150 znaków — domyślna nazwa z sufiksem
   // musi zmieścić się w limicie YouTube.
   const [title, setTitle] = useState(() =>
-    `${playlistTitle} (kopia)`.slice(0, PLAYLIST_TITLE_MAX_LENGTH)
+    `${playlistTitle}${t.copySuffix}`.slice(0, PLAYLIST_TITLE_MAX_LENGTH)
   )
   const count = includedIds.length
   const overLimit = count > PLAYLIST_MAX_VIDEOS
-  const canClone =
-    loggedIn && !cloning && count > 0 && !overLimit && title.trim().length > 0
+  const canClone = loggedIn && !cloning && count > 0 && !overLimit && title.trim().length > 0
 
   return (
     <div className="card clone-card">
-      <h3 className="card-label">Nowa playlista</h3>
+      <h3 className="card-label">{t.newPlaylist}</h3>
       <input
         className="input"
         type="text"
         value={title}
         onChange={(event) => setTitle(event.target.value)}
         maxLength={PLAYLIST_TITLE_MAX_LENGTH}
-        placeholder="Nazwa nowej playlisty"
-        aria-label="Nazwa nowej playlisty"
+        placeholder={t.playlistNamePlaceholder}
+        aria-label={t.playlistNameAria}
       />
-      <p className="clone-meta">
-        {plural(count, ['film', 'filmy', 'filmów'])} · {formatEta(estimateCloneSeconds(count))}
-      </p>
-      {overLimit && (
-        <div className="alert alert-error">
-          YouTube ogranicza playlisty do {PLAYLIST_MAX_VIDEOS} filmów — odznacz część z nich.
-        </div>
-      )}
+      <p className="clone-meta">{t.cloneMeta(count, estimateCloneSeconds(count))}</p>
+      {overLimit && <div className="alert alert-error">{t.overLimit(PLAYLIST_MAX_VIDEOS)}</div>}
       {loggedIn ? (
         <button
           className="btn btn-primary btn-block"
           disabled={!canClone}
           onClick={() => onClone(title.trim(), includedIds)}
         >
-          {cloning ? 'Klonowanie…' : 'Utwórz klona'}
+          {cloning ? t.cloning : t.createClone}
         </button>
       ) : (
         <button className="btn btn-primary btn-block" onClick={onLoginRequest}>
-          Zaloguj się, aby sklonować
+          {t.signInToClone}
         </button>
       )}
       <p className="clone-note">
-        Klon powstanie jako playlista <strong>prywatna</strong> na Twoim koncie — widoczność
-        zmienisz później w YouTube.
+        {t.cloneNotePre}
+        <strong>{t.cloneNoteStrong}</strong>
+        {t.cloneNotePost}
       </p>
     </div>
   )

@@ -2,6 +2,7 @@ import { basename } from 'node:path'
 import { writeFile } from 'node:fs/promises'
 import { BrowserWindow, dialog } from 'electron'
 import type { ExportFormat, ExportSaveRequest, ExportSaveResult } from '../shared/types'
+import { mainStrings } from './locale'
 
 // Treść pliku jest serializowana w rendererze (ma cały model + sortowanie),
 // a proces główny tylko pokazuje okno „Zapisz jako" i zapisuje plik.
@@ -14,19 +15,20 @@ const FILTERS: Record<ExportFormat, Electron.FileFilter[]> = {
 }
 
 function validate(request: unknown): asserts request is ExportSaveRequest {
+  const s = mainStrings().main
   const r = request as ExportSaveRequest | null
-  if (!r || typeof r !== 'object') throw new Error('Nieprawidłowe dane eksportu.')
+  if (!r || typeof r !== 'object') throw new Error(s.exportInvalidData)
   if (r.format !== 'csv' && r.format !== 'xml' && r.format !== 'json') {
-    throw new Error('Nieobsługiwany format eksportu.')
+    throw new Error(s.exportUnsupportedFormat)
   }
   if (typeof r.content !== 'string' || r.content.length === 0) {
-    throw new Error('Brak treści do zapisania.')
+    throw new Error(s.exportNoContent)
   }
   if (Buffer.byteLength(r.content, 'utf8') > MAX_CONTENT_BYTES) {
-    throw new Error('Plik eksportu jest zbyt duży.')
+    throw new Error(s.exportTooLarge)
   }
   if (typeof r.defaultName !== 'string') {
-    throw new Error('Nieprawidłowa nazwa pliku.')
+    throw new Error(s.exportInvalidName)
   }
 }
 
@@ -39,7 +41,7 @@ export async function saveExport(
   const suggested = basename(request.defaultName) || `playlista.${request.format}`
 
   const options: Electron.SaveDialogOptions = {
-    title: 'Zapisz playlistę',
+    title: mainStrings().main.saveDialogTitle,
     defaultPath: suggested,
     filters: FILTERS[request.format]
   }

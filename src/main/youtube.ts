@@ -1,6 +1,7 @@
 import { session } from 'electron'
 import { Innertube } from 'youtubei.js'
 import type { PlaylistData, VideoItem } from '../shared/types'
+import { getLanguage, mainStrings } from './locale'
 
 /**
  * Cała komunikacja z YouTube idzie przez InnerTube — wewnętrzne API strony
@@ -36,10 +37,11 @@ let cached: { client: Innertube; cookie: string } | null = null
 export async function getClient(): Promise<Innertube> {
   const cookie = await buildCookieHeader()
   if (cached?.cookie === cookie) return cached.client
+  const language = getLanguage()
   const client = await Innertube.create({
     cookie: cookie || undefined,
-    lang: 'pl',
-    location: 'PL',
+    lang: language === 'pl' ? 'pl' : 'en',
+    location: language === 'pl' ? 'PL' : 'US',
     // Nie odtwarzamy filmów, więc pomijamy pobieranie i deszyfrowanie playera.
     retrieve_player: false
   })
@@ -134,7 +136,7 @@ function toVideoItem(node: unknown, position: number): VideoItem | null {
   const durationText = textOf(raw.duration?.text)
   return {
     id: raw.id,
-    title: textOf(raw.title) || '(bez tytułu)',
+    title: textOf(raw.title) || mainStrings().main.untitledVideo,
     durationSeconds: typeof seconds === 'number' && Number.isFinite(seconds) ? seconds : 0,
     durationText: durationText === 'N/A' ? '' : durationText,
     channelName: textOf(raw.author?.name),
@@ -148,27 +150,27 @@ function toVideoItem(node: unknown, position: number): VideoItem | null {
 
 function friendlyFetchError(err: unknown): Error {
   const message = err instanceof Error ? err.message : String(err)
+  const s = mainStrings().main
   if (/does not exist|nie istnieje/i.test(message)) {
-    return new Error(
-      'Playlista nie istnieje albo jest prywatna. Jeśli to Twoja prywatna playlista, zaloguj się w aplikacji.'
-    )
+    return new Error(s.playlistMissingOrPrivate)
   }
   if (/sign in|signed in|zaloguj/i.test(message)) {
-    return new Error('Ta playlista wymaga zalogowania. Użyj przycisku „Zaloguj się” u góry.')
+    return new Error(s.playlistNeedsLogin)
   }
-  return new Error(`Nie udało się pobrać playlisty: ${message}`)
+  return new Error(s.fetchFailed(message))
 }
 
 export async function fetchPlaylist(
   input: string,
   onProgress?: (loaded: number, total: number) => void
 ): Promise<PlaylistData> {
+  const s = mainStrings().main
   const id = parsePlaylistId(input)
   if (!id) {
-    throw new Error('Nie rozpoznano playlisty. Wklej link w formacie youtube.com/playlist?list=…')
+    throw new Error(s.playlistNotRecognized)
   }
   if (id.startsWith('RD')) {
-    throw new Error('Miksy YouTube są generowane na bieżąco i nie da się ich sklonować.')
+    throw new Error(s.mixesNotSupported)
   }
 
   const yt = await getClient()
@@ -220,12 +222,12 @@ export async function fetchPlaylist(
   }
 
   if (videos.length === 0) {
-    throw new Error('Playlista jest pusta albo żaden z jej filmów nie jest dostępny.')
+    throw new Error(s.playlistEmpty)
   }
 
   return {
     id,
-    title: textOf(info['title']) || 'Playlista',
+    title: textOf(info['title']) || s.titleFallback,
     description: textOf(info['description']),
     author: textOf(deepFind(info['author'], 'name') ?? info['author']),
     lastUpdated: textOf(info['last_updated']),

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import type { CloneProgress } from '@shared/types'
-import { plural } from '../lib/format'
+import { useStrings } from '../i18n'
 
 interface Props {
   progress: CloneProgress
@@ -15,6 +15,7 @@ export default function CloneModal({
   onClose,
   onOpenResult
 }: Props): React.JSX.Element {
+  const t = useStrings()
   const { stage, added, total, playlistId, message } = progress
   const percent = total > 0 ? Math.round((added / total) * 100) : 0
   const active = stage === 'creating' || stage === 'adding'
@@ -41,7 +42,7 @@ export default function CloneModal({
       className="modal-backdrop"
       role="dialog"
       aria-modal="true"
-      aria-label="Postęp klonowania"
+      aria-label={t.creatingTitle}
       onClick={() => {
         if (!active) onClose()
       }}
@@ -54,7 +55,7 @@ export default function CloneModal({
       >
         {stage === 'creating' && (
           <>
-            <h2>Tworzenie playlisty…</h2>
+            <h2>{t.creatingTitle}</h2>
             <div className="progress">
               <div className="progress-fill progress-indeterminate" />
             </div>
@@ -63,16 +64,12 @@ export default function CloneModal({
 
         {stage === 'adding' && (
           <>
-            <h2>Dodawanie filmów…</h2>
+            <h2>{t.addingTitle}</h2>
             <div className="progress">
               <div className="progress-fill" style={{ width: `${percent}%` }} />
             </div>
-            <p className="modal-meta">
-              Dodano {added} z {total} ({percent}%)
-            </p>
-            <p className="modal-hint">
-              Tempo jest celowo ograniczone, żeby YouTube nie odrzucał żądań.
-            </p>
+            <p className="modal-meta">{t.addedOf(added, total, percent)}</p>
+            <p className="modal-hint">{t.pacingHint}</p>
           </>
         )}
 
@@ -81,21 +78,15 @@ export default function CloneModal({
             <div className="modal-icon modal-icon-ok" aria-hidden="true">
               ✓
             </div>
-            <h2>Gotowe!</h2>
-            <p className="modal-meta">
-              Sklonowano {plural(added, ['film', 'filmy', 'filmów'])}. Playlista jest prywatna —
-              widoczność zmienisz w YouTube.
-            </p>
+            <h2>{t.doneTitle}</h2>
+            <p className="modal-meta">{t.doneMessage(added)}</p>
           </>
         )}
 
         {stage === 'cancelled' && (
           <>
-            <h2>Przerwano</h2>
-            <p className="modal-meta">
-              Na koncie została częściowa playlista ({added} z {total} filmów) — możesz ją
-              dokończyć ręcznie albo usunąć w YouTube.
-            </p>
+            <h2>{t.cancelledTitle}</h2>
+            <p className="modal-meta">{t.cancelledMessage(added, total)}</p>
           </>
         )}
 
@@ -104,31 +95,26 @@ export default function CloneModal({
             <div className="modal-icon modal-icon-error" aria-hidden="true">
               !
             </div>
-            <h2>Nie udało się</h2>
-            <p className="modal-meta">{message ?? 'Wystąpił nieznany błąd.'}</p>
-            {added > 0 && (
-              <p className="modal-hint">
-                Zanim wystąpił błąd, dodano {added} z {total} filmów — częściowa playlista została
-                na Twoim koncie.
-              </p>
-            )}
+            <h2>{t.errorTitle}</h2>
+            <p className="modal-meta">{message ?? t.unknownError}</p>
+            {added > 0 && <p className="modal-hint">{t.partialHint(added, total)}</p>}
           </>
         )}
 
         <div className="modal-actions">
           {active && (
             <button className="btn btn-ghost" onClick={onCancel}>
-              Anuluj
+              {t.cancel}
             </button>
           )}
           {!active && playlistId && (
             <button className="btn btn-primary" onClick={() => onOpenResult(playlistId)}>
-              Otwórz w YouTube
+              {t.openInYouTube}
             </button>
           )}
           {!active && (
             <button className="btn btn-ghost" autoFocus onClick={onClose}>
-              Zamknij
+              {t.close}
             </button>
           )}
         </div>

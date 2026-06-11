@@ -9,6 +9,7 @@ import {
 import { logout, openLoginWindow } from './auth'
 import { cancelClone, runClone } from './cloner'
 import { saveExport } from './export'
+import { mainStrings } from './locale'
 import { fetchPlaylist, getAccountInfo, isLoggedIn } from './youtube'
 
 const YOUTUBE_URL = /^https:\/\/(www\.|music\.)?(youtube\.com|youtu\.be)\//
@@ -20,21 +21,22 @@ async function authState(): Promise<AuthState> {
 }
 
 function validateCloneRequest(request: unknown): asserts request is CloneRequest {
+  const s = mainStrings().main
   const r = request as CloneRequest | null
   if (!r || typeof r.title !== 'string' || r.title.trim().length === 0) {
-    throw new Error('Podaj nazwę nowej playlisty.')
+    throw new Error(s.enterPlaylistName)
   }
   if (r.title.trim().length > PLAYLIST_TITLE_MAX_LENGTH) {
-    throw new Error(`Nazwa playlisty może mieć najwyżej ${PLAYLIST_TITLE_MAX_LENGTH} znaków.`)
+    throw new Error(s.titleTooLong(PLAYLIST_TITLE_MAX_LENGTH))
   }
   if (!Array.isArray(r.videoIds) || r.videoIds.length === 0) {
-    throw new Error('Lista filmów do sklonowania jest pusta.')
+    throw new Error(s.cloneListEmpty)
   }
   if (r.videoIds.length > PLAYLIST_MAX_VIDEOS) {
-    throw new Error(`YouTube ogranicza playlisty do ${PLAYLIST_MAX_VIDEOS} filmów.`)
+    throw new Error(s.tooManyVideos(PLAYLIST_MAX_VIDEOS))
   }
   if (!r.videoIds.every((id) => typeof id === 'string' && /^[A-Za-z0-9_-]{6,20}$/.test(id))) {
-    throw new Error('Lista zawiera nieprawidłowy identyfikator filmu.')
+    throw new Error(s.invalidVideoId)
   }
 }
 
@@ -53,7 +55,7 @@ export function registerIpcHandlers(): void {
   })
 
   ipcMain.handle(IPC.PlaylistFetch, (event, input: unknown) => {
-    if (typeof input !== 'string') throw new Error('Nieprawidłowe dane wejściowe.')
+    if (typeof input !== 'string') throw new Error(mainStrings().main.invalidInput)
     return fetchPlaylist(input, (loaded, total) => {
       if (!event.sender.isDestroyed()) {
         event.sender.send(IPC.PlaylistFetchProgress, { loaded, total })
@@ -64,7 +66,7 @@ export function registerIpcHandlers(): void {
   ipcMain.handle(IPC.CloneStart, async (event, request: unknown) => {
     validateCloneRequest(request)
     if (!(await isLoggedIn())) {
-      throw new Error('Zaloguj się, aby utworzyć playlistę na swoim koncie.')
+      throw new Error(mainStrings().main.signInToCreate)
     }
     return runClone(request, event.sender)
   })

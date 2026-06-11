@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { FetchProgress } from '@shared/types'
-import { plural } from '../lib/format'
+import { useStrings } from '../i18n'
 
 interface Props {
   fetching: boolean
@@ -9,38 +9,21 @@ interface Props {
   onFetch: (input: string) => void
 }
 
-const FEATURES = [
-  {
-    title: 'Bez API Google',
-    body: 'Aplikacja rozmawia z YouTube tak jak przeglądarka — bez kluczy API i dziennych limitów quota.'
-  },
-  {
-    title: 'Twoje konto, Twoja sesja',
-    body: 'Logujesz się w oknie aplikacji, a sesja zostaje na Twoim komputerze. Żadnych zewnętrznych serwerów.'
-  },
-  {
-    title: 'Dowolna kolejność',
-    body: 'Posortuj filmy po tytule, długości lub kanale, przetasuj losowo albo ułóż ręcznie przeciąganiem.'
-  }
-] as const
-
 export default function HomeScreen({
   fetching,
   progress,
   error,
   onFetch
 }: Props): React.JSX.Element {
+  const t = useStrings()
   const [input, setInput] = useState('')
   const canSubmit = input.trim().length > 0 && !fetching
 
   return (
     <div className="home">
       <section className="hero">
-        <h1>Sklonuj playlistę YouTube</h1>
-        <p className="hero-sub">
-          Wklej link do playlisty — publicznej, niepublicznej albo własnej prywatnej — ułóż filmy
-          po swojemu i zapisz kopię na swoim koncie.
-        </p>
+        <h1>{t.heroTitle}</h1>
+        <p className="hero-sub">{t.heroSubtitle}</p>
         <form
           className="fetch-form"
           onSubmit={(event) => {
@@ -51,7 +34,7 @@ export default function HomeScreen({
           <input
             className="input fetch-input"
             type="text"
-            placeholder="https://www.youtube.com/playlist?list=…"
+            placeholder={t.fetchPlaceholder}
             value={input}
             onChange={(event) => setInput(event.target.value)}
             disabled={fetching}
@@ -59,17 +42,13 @@ export default function HomeScreen({
             autoFocus
           />
           <button className="btn btn-primary" type="submit" disabled={!canSubmit}>
-            {fetching ? 'Pobieranie…' : 'Pobierz playlistę'}
+            {fetching ? t.fetching : t.fetchButton}
           </button>
         </form>
         {fetching && (
           <div className="fetch-status" role="status">
             <span className="spinner" aria-hidden="true" />
-            {progress
-              ? `Pobrano ${plural(progress.loaded, ['film', 'filmy', 'filmów'])}${
-                  progress.total > progress.loaded ? ` z ~${progress.total}` : ''
-                }`
-              : 'Łączenie z YouTube…'}
+            {progress ? t.fetchedCount(progress.loaded, progress.total) : t.connecting}
           </div>
         )}
         {error && (
@@ -79,7 +58,7 @@ export default function HomeScreen({
         )}
       </section>
       <section className="feature-cards">
-        {FEATURES.map((feature) => (
+        {t.features.map((feature) => (
           <article className="card feature-card" key={feature.title}>
             <h3>{feature.title}</h3>
             <p>{feature.body}</p>

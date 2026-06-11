@@ -2,6 +2,7 @@ import { join } from 'node:path'
 import { BrowserWindow, app, session, shell } from 'electron'
 import appIcon from '../../resources/icon.png?asset'
 import { registerIpcHandlers } from './ipc'
+import { getLanguage } from './locale'
 import { YT_PARTITION } from './youtube'
 
 const YOUTUBE_URL = /^https:\/\/(www\.|music\.)?(youtube\.com|youtu\.be)\//
@@ -23,7 +24,10 @@ function createMainWindow(): void {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: true,
       contextIsolation: true,
-      nodeIntegration: false
+      nodeIntegration: false,
+      // Język ustalony z systemu trafia do renderera synchronicznie (argv),
+      // żeby UI nie migotało przed asynchronicznym pobraniem.
+      additionalArguments: [`--app-language=${getLanguage()}`]
     }
   })
 

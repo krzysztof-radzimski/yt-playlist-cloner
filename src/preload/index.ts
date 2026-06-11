@@ -1,7 +1,11 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import type { RendererApi } from '../shared/api'
+import type { Language } from '../shared/i18n'
 import { IPC } from '../shared/ipc'
 import type { CloneRequest, ExportSaveRequest } from '../shared/types'
+
+const languageArg = process.argv.find((arg) => arg.startsWith('--app-language='))?.split('=')[1]
+const language: Language = languageArg === 'pl' ? 'pl' : 'en'
 
 function subscribe<T>(channel: string, callback: (payload: T) => void): () => void {
   const listener = (_event: Electron.IpcRendererEvent, payload: T): void => callback(payload)
@@ -11,6 +15,7 @@ function subscribe<T>(channel: string, callback: (payload: T) => void): () => vo
 
 const api: RendererApi = {
   platform: process.platform,
+  language,
   auth: {
     getState: () => ipcRenderer.invoke(IPC.AuthGetState),
     login: () => ipcRenderer.invoke(IPC.AuthLogin),

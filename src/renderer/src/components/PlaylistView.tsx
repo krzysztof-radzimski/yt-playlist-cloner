@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useRef, useState } from 'react'
 import type { PlaylistData, VideoItem } from '@shared/types'
-import { formatLongDuration, plural } from '../lib/format'
+import { useStrings } from '../i18n'
 import { arrayMove, shuffleArray, sortVideos, videoKey, type SortSpec } from '../lib/sort'
 import ClonePanel from './ClonePanel'
 import ExportPanel from './ExportPanel'
@@ -27,6 +27,7 @@ export default function PlaylistView({
   onLoginRequest,
   onBack
 }: Props): React.JSX.Element {
+  const t = useStrings()
   const [order, setOrder] = useState<VideoItem[]>(playlist.videos)
   const [spec, setSpec] = useState<SortSpec>({ mode: 'original', descending: false })
   const [excluded, setExcluded] = useState<ReadonlySet<string>>(
@@ -105,20 +106,11 @@ export default function PlaylistView({
     <div className="playlist-layout">
       <section className="list-pane">
         <header className="list-header">
-          <span className="list-header-count">
-            {plural(order.length, ['film', 'filmy', 'filmów'])}
-          </span>
+          <span className="list-header-count">{t.videosCount(order.length)}</span>
           {unavailableCount > 0 && (
-            <span className="list-header-note">
-              {plural(unavailableCount, [
-                'niedostępny film',
-                'niedostępne filmy',
-                'niedostępnych filmów'
-              ])}{' '}
-              — domyślnie poza klonem
-            </span>
+            <span className="list-header-note">{t.unavailableNote(unavailableCount)}</span>
           )}
-          <span className="list-header-hint">Przeciągaj wiersze, aby ułożyć ręcznie</span>
+          <span className="list-header-hint">{t.dragHint}</span>
         </header>
         <ol
           className="video-list"
@@ -142,15 +134,13 @@ export default function PlaylistView({
               onDropAt={handleRowDrop}
             />
           ))}
-          {visibleCount < order.length && (
-            <li className="list-more">Przewiń niżej, aby wczytać kolejne wiersze…</li>
-          )}
+          {visibleCount < order.length && <li className="list-more">{t.loadMore}</li>}
         </ol>
       </section>
 
       <aside className="side-pane">
         <button className="btn btn-ghost btn-back" onClick={onBack}>
-          ← Inna playlista
+          {t.anotherPlaylist}
         </button>
         <div className="card summary-card">
           <h2 className="summary-title" title={playlist.title}>
@@ -159,12 +149,12 @@ export default function PlaylistView({
           {playlist.author && <p className="summary-author">{playlist.author}</p>}
           <dl className="summary-stats">
             <div>
-              <dt>Do klonowania</dt>
-              <dd>{plural(included.length, ['film', 'filmy', 'filmów'])}</dd>
+              <dt>{t.summaryToClone}</dt>
+              <dd>{t.videosCount(included.length)}</dd>
             </div>
             <div>
-              <dt>Łączny czas</dt>
-              <dd>{formatLongDuration(totalSeconds)}</dd>
+              <dt>{t.summaryTotalTime}</dt>
+              <dd>{t.totalTime(totalSeconds)}</dd>
             </div>
           </dl>
         </div>

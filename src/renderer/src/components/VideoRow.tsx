@@ -1,5 +1,6 @@
 import { memo } from 'react'
 import type { VideoItem } from '@shared/types'
+import { useStrings } from '../i18n'
 import { videoKey } from '../lib/sort'
 
 /** Własny typ dataTransfer — wiersze przyjmują tylko przeciągnięcia wierszy,
@@ -25,6 +26,7 @@ function VideoRow({
   onDragEnd,
   onDropAt
 }: Props): React.JSX.Element {
+  const t = useStrings()
   const classNames = ['video-row']
   if (excluded) classNames.push('is-excluded')
   if (!video.isPlayable) classNames.push('is-unavailable')
@@ -60,17 +62,14 @@ function VideoRow({
         </span>
         <span className="row-channel">
           {video.channelName}
-          {!video.isPlayable && <span className="badge badge-warn">niedostępny</span>}
+          {!video.isPlayable && <span className="badge badge-warn">{t.unavailableBadge}</span>}
         </span>
       </span>
-      <label
-        className="row-include"
-        title={excluded ? 'Pominięty — zaznacz, aby dodać do klona' : 'Odznacz, aby pominąć'}
-      >
+      <label className="row-include" title={excluded ? t.skipTooltip : t.includeTooltip}>
         <input
           type="checkbox"
           checked={!excluded}
-          aria-label={`Uwzględnij w klonie: ${video.title}`}
+          aria-label={t.includeAria(video.title)}
           onChange={() => onToggleExcluded(videoKey(video))}
         />
       </label>

@@ -1,3 +1,4 @@
+import { type ExportStrings, type Language, getStrings } from '@shared/i18n'
 import type { ExportFormat, PlaylistData, VideoItem } from '@shared/types'
 import { videoKey } from './sort'
 
@@ -34,20 +35,20 @@ interface ExportRow {
   available: boolean
 }
 
-function localizePrivacy(raw: string): string {
+function localizePrivacy(raw: string, t: ExportStrings): string {
   switch (raw.toUpperCase()) {
     case 'PUBLIC':
-      return 'Publiczna'
+      return t.privacyPublic
     case 'UNLISTED':
-      return 'Niepubliczna'
+      return t.privacyUnlisted
     case 'PRIVATE':
-      return 'Prywatna'
+      return t.privacyPrivate
     default:
       return raw
   }
 }
 
-function buildMeta(playlist: PlaylistData, rowCount: number): ExportPlaylistMeta {
+function buildMeta(playlist: PlaylistData, rowCount: number, t: ExportStrings): ExportPlaylistMeta {
   return {
     id: playlist.id,
     title: playlist.title,
@@ -55,7 +56,7 @@ function buildMeta(playlist: PlaylistData, rowCount: number): ExportPlaylistMeta
     author: playlist.author,
     lastUpdated: playlist.lastUpdated,
     views: playlist.views,
-    privacy: localizePrivacy(playlist.privacy),
+    privacy: localizePrivacy(playlist.privacy, t),
     videoCount: rowCount,
     url: `https://www.youtube.com/playlist?list=${playlist.id}`
   }
@@ -114,30 +115,30 @@ function metaComment(label: string, value: string): string {
   return `# ${label}: ${value.replace(/\s*[\r\n]+\s*/g, ' ').trim()}`
 }
 
-function toCsv(meta: ExportPlaylistMeta, rows: ExportRow[]): string {
+function toCsv(meta: ExportPlaylistMeta, rows: ExportRow[], t: ExportStrings): string {
   const header = [
-    metaComment('Playlista', meta.title),
-    metaComment('Opis', meta.description),
-    metaComment('Autor', meta.author),
-    metaComment('Aktualizacja', meta.lastUpdated),
-    metaComment('Wyświetlenia', meta.views),
-    metaComment('Prywatność', meta.privacy),
-    metaComment('Liczba filmów', String(meta.videoCount)),
-    metaComment('URL', meta.url),
+    metaComment(t.metaPlaylist, meta.title),
+    metaComment(t.metaDescription, meta.description),
+    metaComment(t.metaAuthor, meta.author),
+    metaComment(t.metaUpdated, meta.lastUpdated),
+    metaComment(t.metaViews, meta.views),
+    metaComment(t.metaPrivacy, meta.privacy),
+    metaComment(t.metaVideoCount, String(meta.videoCount)),
+    metaComment(t.metaUrl, meta.url),
     ''
   ]
   const columns = [
-    'Lp.',
-    'Pozycja oryginalna',
-    'W klonie',
-    'ID',
-    'Tytuł',
-    'Kanał',
-    'ID kanału',
-    'Czas',
-    'Czas (s)',
-    'URL',
-    'Dostępny'
+    t.colNo,
+    t.colOriginalPos,
+    t.colInClone,
+    t.colId,
+    t.colTitle,
+    t.colChannel,
+    t.colChannelId,
+    t.colDuration,
+    t.colDurationSec,
+    t.colUrl,
+    t.colAvailable
   ]
   const lines = [columns.map(csvCell).join(',')]
   for (const row of rows) {
@@ -145,7 +146,7 @@ function toCsv(meta: ExportPlaylistMeta, rows: ExportRow[]): string {
       [
         row.order,
         row.position,
-        row.included ? 'tak' : 'nie',
+        row.included ? t.yes : t.no,
         row.videoId,
         row.title,
         row.channel,
@@ -153,7 +154,7 @@ function toCsv(meta: ExportPlaylistMeta, rows: ExportRow[]): string {
         row.durationText,
         row.durationSeconds,
         row.url,
-        row.available ? 'tak' : 'nie'
+        row.available ? t.yes : t.no
       ]
         .map(csvCell)
         .join(',')
@@ -213,26 +214,28 @@ export function serializePlaylist(
   format: ExportFormat,
   playlist: PlaylistData,
   order: readonly VideoItem[],
-  excluded: ReadonlySet<string>
+  excluded: ReadonlySet<string>,
+  lang: Language
 ): string {
+  const t = getStrings(lang).exporter
   const rows = buildRows(order, excluded)
-  const meta = buildMeta(playlist, rows.length)
+  const meta = buildMeta(playlist, rows.length, t)
   switch (format) {
     case 'json':
       return toJson(meta, rows)
     case 'csv':
-      return toCsv(meta, rows)
+      return toCsv(meta, rows, t)
     case 'xml':
       return toXml(meta, rows)
   }
 }
 
 /** Bezpieczna nazwa pliku z tytułu playlisty + rozszerzenie formatu. */
-export function exportFileName(title: string, format: ExportFormat): string {
+export function exportFileName(title: string, format: ExportFormat, lang: Language): string {
   const safe = title
     .replace(/[\\/:*?"<>|]/g, '_')
     .replace(/\s+/g, ' ')
     .trim()
     .slice(0, 80)
-  return `${safe || 'playlista'}.${format}`
+  return `${safe || getStrings(lang).exporter.fileFallback}.${format}`
 }

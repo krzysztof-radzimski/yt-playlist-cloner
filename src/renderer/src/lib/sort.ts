@@ -7,11 +7,12 @@ export interface SortSpec {
   descending: boolean
 }
 
-export const SORT_OPTIONS: Array<{ mode: Exclude<SortMode, 'custom'>; label: string }> = [
-  { mode: 'original', label: 'Kolejność oryginalna' },
-  { mode: 'title', label: 'Tytuł' },
-  { mode: 'duration', label: 'Długość' },
-  { mode: 'channel', label: 'Kanał' }
+/** Tryby w kolejności wyświetlania; etykiety pochodzą ze słownika i18n. */
+export const SORT_MODES: ReadonlyArray<Exclude<SortMode, 'custom'>> = [
+  'original',
+  'title',
+  'duration',
+  'channel'
 ]
 
 const collator = new Intl.Collator('pl', { sensitivity: 'base', numeric: true })

@@ -1,3 +1,4 @@
+import type { Language } from './i18n'
 import type {
   AuthState,
   CloneProgress,
@@ -14,6 +15,7 @@ import type {
  */
 export interface RendererApi {
   platform: NodeJS.Platform
+  language: Language
   auth: {
     getState(): Promise<AuthState>
     login(): Promise<AuthState>

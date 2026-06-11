@@ -6,6 +6,7 @@ import {
   type CloneProgress,
   type CloneRequest
 } from '../shared/types'
+import { mainStrings } from './locale'
 import { getClient } from './youtube'
 
 /**
@@ -63,7 +64,7 @@ interface CreatePlaylistResult {
 }
 
 export async function runClone(request: CloneRequest, target: WebContents): Promise<void> {
-  if (running) throw new Error('Poprzednie klonowanie jeszcze trwa.')
+  if (running) throw new Error(mainStrings().main.cloneInProgress)
   running = true
   cancelRequested = false
 
@@ -86,7 +87,7 @@ export async function runClone(request: CloneRequest, target: WebContents): Prom
       request.videoIds.slice(0, 1)
     )) as CreatePlaylistResult
     playlistId = created.playlist_id ?? created.data?.playlistId
-    if (!playlistId) throw new Error('YouTube nie zwrócił identyfikatora nowej playlisty.')
+    if (!playlistId) throw new Error(mainStrings().main.noNewPlaylistId)
     added = 1
     send({ stage: 'adding', added, total, playlistId })
 
