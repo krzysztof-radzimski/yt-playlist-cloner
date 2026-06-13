@@ -26,6 +26,19 @@ export interface PlaylistData {
   videos: VideoItem[]
 }
 
+/**
+ * Pozycja z listy playlist zalogowanego konta (browse FEplaylist_aggregation).
+ * Służy tylko do wyboru w UI — klon i tak przechodzi pełną ścieżką fetchPlaylist.
+ */
+export interface MyPlaylist {
+  id: string
+  title: string
+  /** Liczba filmów, jeśli InnerTube ją podał; 0 = nieznana. */
+  videoCount: number
+  /** Miniatura playlisty (URL z InnerTube) lub brak. */
+  thumbnailUrl?: string
+}
+
 export type ExportFormat = 'csv' | 'xml' | 'json'
 
 export interface ExportSaveRequest {

@@ -113,6 +113,7 @@ export default function App(): React.JSX.Element {
         ) : (
           <HomeScreen
             fetching={fetching}
+            loggedIn={auth.loggedIn}
             progress={fetchProgress}
             error={fetchError}
             onFetch={handleFetch}

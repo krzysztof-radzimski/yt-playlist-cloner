@@ -10,7 +10,7 @@ import { logout, openLoginWindow } from './auth'
 import { cancelClone, runClone } from './cloner'
 import { saveExport } from './export'
 import { mainStrings } from './locale'
-import { fetchPlaylist, getAccountInfo, isLoggedIn } from './youtube'
+import { fetchMyPlaylists, fetchPlaylist, getAccountInfo, isLoggedIn } from './youtube'
 
 const YOUTUBE_URL = /^https:\/\/(www\.|music\.)?(youtube\.com|youtu\.be)\//
 
@@ -61,6 +61,12 @@ export function registerIpcHandlers(): void {
         event.sender.send(IPC.PlaylistFetchProgress, { loaded, total })
       }
     })
+  })
+
+  ipcMain.handle(IPC.PlaylistMine, async () => {
+    // Lista własnych playlist ma sens tylko pod zalogowaną sesją.
+    if (!(await isLoggedIn())) return []
+    return fetchMyPlaylists()
   })
 
   ipcMain.handle(IPC.CloneStart, async (event, request: unknown) => {

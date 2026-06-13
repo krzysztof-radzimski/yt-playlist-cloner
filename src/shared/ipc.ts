@@ -4,6 +4,7 @@ export const IPC = {
   AuthLogout: 'auth:logout',
   PlaylistFetch: 'playlist:fetch',
   PlaylistFetchProgress: 'playlist:fetch-progress',
+  PlaylistMine: 'playlist:mine',
   CloneStart: 'clone:start',
   CloneCancel: 'clone:cancel',
   CloneProgress: 'clone:progress',

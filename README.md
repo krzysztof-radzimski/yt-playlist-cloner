@@ -9,11 +9,22 @@ shuffle, drag to reorder), and save a copy as a new playlist on your account.
 The interface is **bilingual**: it shows in Polish on a Polish operating system and in English
 everywhere else (detected automatically from your OS language).
 
+## Screenshots
+
+**Home — pick one of your own playlists, or paste a link**
+
+![Home screen with the “Your playlists” picker](docs/screenshot-home.png)
+
+**Reorder, sort or shuffle, then clone to your account**
+
+![Playlist view with the sorting and clone panel](docs/screenshot-playlist.png)
+
 ## Features
 
 - **Fetch playlists without signing in** — public and unlisted playlists are read through
   InnerTube (youtube.com's internal API) with 100-videos-per-page continuation paging.
-- **Your own private playlists** — after signing in inside the app window.
+- **Your own playlists** — after signing in inside the app window, pick any playlist from your
+  account directly from a list (no link needed), including your private ones.
 - **Sorting** — original order, title, length, channel (locale-aware collation), ascending or
   descending, random shuffle, and manual drag-and-drop ordering.
 - **Export to file** — save the playlist as CSV, JSON, or XML: playlist metadata (title,

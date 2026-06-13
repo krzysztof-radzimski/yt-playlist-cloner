@@ -96,6 +96,15 @@ export interface AppStrings {
   fetchedCount: (loaded: number, total: number) => string
   features: ReadonlyArray<{ title: string; body: string }>
 
+  // HomeScreen — moje playlisty
+  myPlaylistsTitle: string
+  myPlaylistsHint: string
+  myPlaylistsLoading: string
+  myPlaylistsEmpty: string
+  myPlaylistsError: string
+  myPlaylistsRefresh: string
+  pickPlaylistAria: (title: string) => string
+
   // PlaylistView
   videosCount: (n: number) => string
   unavailableNote: (n: number) => string
@@ -215,6 +224,14 @@ function buildPl(): AppStrings {
         body: 'Posortuj filmy po tytule, długości lub kanale, przetasuj losowo albo ułóż ręcznie przeciąganiem.'
       }
     ],
+
+    myPlaylistsTitle: 'Twoje playlisty',
+    myPlaylistsHint: 'Kliknij jedną z Twoich playlist albo wklej link powyżej.',
+    myPlaylistsLoading: 'Wczytywanie Twoich playlist…',
+    myPlaylistsEmpty: 'Nie masz jeszcze żadnych playlist na tym koncie.',
+    myPlaylistsError: 'Nie udało się wczytać Twoich playlist.',
+    myPlaylistsRefresh: 'Odśwież',
+    pickPlaylistAria: (title) => `Sklonuj playlistę: ${title}`,
 
     videosCount: videos,
     unavailableNote: (n) =>
@@ -388,6 +405,14 @@ function buildEn(): AppStrings {
         body: 'Sort videos by title, length, or channel, shuffle them randomly, or arrange them by hand with drag and drop.'
       }
     ],
+
+    myPlaylistsTitle: 'Your playlists',
+    myPlaylistsHint: 'Click one of your playlists, or paste a link above.',
+    myPlaylistsLoading: 'Loading your playlists…',
+    myPlaylistsEmpty: 'You don’t have any playlists on this account yet.',
+    myPlaylistsError: 'Couldn’t load your playlists.',
+    myPlaylistsRefresh: 'Refresh',
+    pickPlaylistAria: (title) => `Clone playlist: ${title}`,
 
     videosCount: videos,
     unavailableNote: (n) =>

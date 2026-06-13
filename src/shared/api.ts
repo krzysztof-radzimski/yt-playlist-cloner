@@ -6,6 +6,7 @@ import type {
   ExportSaveRequest,
   ExportSaveResult,
   FetchProgress,
+  MyPlaylist,
   PlaylistData
 } from './types'
 
@@ -24,6 +25,8 @@ export interface RendererApi {
   playlist: {
     fetch(input: string): Promise<PlaylistData>
     onFetchProgress(callback: (progress: FetchProgress) => void): () => void
+    /** Playlisty zalogowanego konta do wyboru w UI; [] gdy niezalogowany. */
+    listMine(): Promise<MyPlaylist[]>
   }
   clone: {
     start(request: CloneRequest): Promise<void>

@@ -10,11 +10,22 @@ swoim koncie.
 Interfejs jest **dwujęzyczny**: po polsku na systemie z polską lokalizacją, a po angielsku na
 pozostałych (język wykrywany automatycznie z ustawień systemu).
 
+## Zrzuty ekranu
+
+**Ekran startowy — wybierz jedną ze swoich playlist albo wklej link**
+
+![Ekran startowy z sekcją „Twoje playlisty”](docs/screenshot-home.png)
+
+**Ułóż, posortuj lub przetasuj, a potem sklonuj na swoje konto**
+
+![Widok playlisty z panelem sortowania i klonowania](docs/screenshot-playlist.png)
+
 ## Funkcje
 
 - **Pobieranie playlist bez logowania** — publiczne i niepubliczne (unlisted) playlisty czytane
   są przez InnerTube (wewnętrzne API strony youtube.com) ze stronicowaniem po 100 filmów.
-- **Własne prywatne playlisty** — po zalogowaniu w oknie aplikacji.
+- **Własne playlisty** — po zalogowaniu w oknie aplikacji wybierzesz dowolną playlistę swojego
+  konta wprost z listy (bez wklejania linku), w tym prywatne.
 - **Sortowanie** — kolejność oryginalna, tytuł, długość, kanał (z polskim collatorem),
   kierunek rosnąco/malejąco, tasowanie losowe i ręczne układanie przeciąganiem.
 - **Eksport do pliku** — zapis playlisty jako CSV, JSON lub XML: metadane playlisty

@@ -1,6 +1,6 @@
 import { session } from 'electron'
 import { Innertube } from 'youtubei.js'
-import type { PlaylistData, VideoItem } from '../shared/types'
+import type { MyPlaylist, PlaylistData, VideoItem } from '../shared/types'
 import { getLanguage, mainStrings } from './locale'
 
 /**
@@ -117,6 +117,99 @@ export function parsePlaylistId(input: string): string | null {
   if (fromParam) return fromParam
   if (!trimmed.includes('://') && /^[A-Za-z0-9_-]{2,}$/.test(trimmed)) return trimmed
   return null
+}
+
+/** Pierwsza niepusta wartość typu string z podanych kandydatów. */
+function firstString(...values: unknown[]): string {
+  for (const value of values) if (typeof value === 'string' && value.length > 0) return value
+  return ''
+}
+
+/** Liczba filmów z tekstu typu „12", „12 filmów", „1 234 wideo"; 0 gdy brak. */
+function parseCount(value: unknown): number {
+  const digits = textOf(value).replace(/[^\d]/g, '')
+  return digits ? Number(digits) : 0
+}
+
+/**
+ * Liczba z frazy zawierającej jednostkę: „163 filmy", „1 film", „10 odcinków",
+ * „43 videos". Słowo-jednostka jest kotwicą, żeby nie złapać innych liczb
+ * (daty, wymiary miniatury, kody kolorów) z tej samej odpowiedzi.
+ */
+function countFromText(value: unknown): number {
+  const text = typeof value === 'string' ? value : textOf(value)
+  const match =
+    /(\d[\d\s.,]*)\s*(?:film|wideo|video|odcin|utw|track|song|episode|piosenk)/i.exec(text)
+  return match ? parseCount(match[1]) : 0
+}
+
+/**
+ * Playlisty zalogowanego konta przychodzą w różnych kształtach (gridPlaylistRenderer,
+ * lockupViewModel) — wyciągamy pola defensywnie (firstString/deepFind/textOf),
+ * nigdy sztywną ścieżką JSON. Zwraca null dla wpisów bez ID i dla miksów.
+ */
+function toMyPlaylist(node: unknown): MyPlaylist | null {
+  const id = firstString(
+    (node as { id?: unknown }).id,
+    (node as { content_id?: unknown }).content_id,
+    deepFind(node, 'playlistId'),
+    deepFind(node, 'contentId')
+  )
+  // Miksy RD są generowane na bieżąco — nie da się ich sklonować.
+  if (!id || id.startsWith('RD')) return null
+  const title =
+    textOf((node as { title?: unknown }).title) ||
+    textOf(deepFind((node as { metadata?: unknown }).metadata, 'title')) ||
+    textOf(deepFind(node, 'title')) ||
+    mainStrings().main.titleFallback
+  // LockupView trzyma miniaturę w content_image, a liczbę filmów w plakietce
+  // miniatury („163 filmy"); GridPlaylist — w thumbnails i video_count. Oba kształty.
+  const contentImage = (node as { content_image?: unknown }).content_image
+  const thumbnailUrl =
+    firstThumbnailUrl((node as { thumbnails?: unknown }).thumbnails) ??
+    firstThumbnailUrl(deepFind(contentImage, 'image')) ??
+    firstThumbnailUrl(deepFind(node, 'thumbnails'))
+  const videoCount =
+    parseCount((node as { video_count?: unknown }).video_count) ||
+    parseCount((node as { video_count_short?: unknown }).video_count_short) ||
+    parseCount(deepFind(node, 'thumbnailText')) ||
+    parseCount(deepFind(node, 'videoCountText')) ||
+    countFromText(JSON.stringify(contentImage))
+  return { id, title, videoCount, thumbnailUrl }
+}
+
+/**
+ * Lista playlist zalogowanego użytkownika (browse FEplaylist_aggregation), z paczkami
+ * kontynuacji dla kont z wieloma playlistami. Tylko do wyboru w UI.
+ */
+export async function fetchMyPlaylists(): Promise<MyPlaylist[]> {
+  const yt = await getClient()
+  let feed = await yt.getPlaylists()
+
+  const out: MyPlaylist[] = []
+  const seen = new Set<string>()
+  const collect = (nodes: unknown): void => {
+    for (const node of Array.isArray(nodes) ? nodes : []) {
+      const item = toMyPlaylist(node)
+      if (item && !seen.has(item.id)) {
+        seen.add(item.id)
+        out.push(item)
+      }
+    }
+  }
+
+  collect(feed.playlists)
+  let pages = 0
+  while (feed.has_continuation && pages < 30) {
+    pages++
+    try {
+      feed = await feed.getContinuation()
+    } catch {
+      break
+    }
+    collect(feed.playlists)
+  }
+  return out
 }
 
 interface RawPlaylistVideo {

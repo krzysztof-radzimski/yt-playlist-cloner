@@ -23,7 +23,8 @@ const api: RendererApi = {
   },
   playlist: {
     fetch: (input: string) => ipcRenderer.invoke(IPC.PlaylistFetch, input),
-    onFetchProgress: (callback) => subscribe(IPC.PlaylistFetchProgress, callback)
+    onFetchProgress: (callback) => subscribe(IPC.PlaylistFetchProgress, callback),
+    listMine: () => ipcRenderer.invoke(IPC.PlaylistMine)
   },
   clone: {
     start: (request: CloneRequest) => ipcRenderer.invoke(IPC.CloneStart, request),
